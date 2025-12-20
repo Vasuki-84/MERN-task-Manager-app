@@ -1,5 +1,6 @@
 const taskModel = require("../models/task.model");
 
+// POST api
 const createTasks = async (req, res) => {
   const { title, description, status, priority } = req.body;
   try {
@@ -13,4 +14,60 @@ const createTasks = async (req, res) => {
     res.status(500).json({ message: "Tasks not added" });
   }
 };
-module.exports = createTasks;
+
+// GET all Tasks api
+const getAllTasks = async (req, res) => {
+  try {
+    const tasks = await taskModel.find();
+    res.status(200).json(tasks);
+  } catch (err) {
+    res.status(500).json({ message: "Tasks Fetching failed" });
+  }
+};
+
+// GET tasks BY ID api
+const getTasksById = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const task = await taskModel.findById(id);
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" });
+    }
+    res.status(200).json(task);
+  } catch (err) {
+    res.status(500).json({ message: "Task fetching failure" });
+  }
+};
+
+// PUT api
+const updateTasks = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const updateTask = await taskModel.findByIdAndUpdate(id, req.body, {
+      new: true,
+    });
+    res.status(200).json({ message: "Task updated" });
+  } catch (err) {
+    res.status(500).json({ message: "Task updation failure" });
+  }
+};
+
+// DELETE api
+const deleteTask = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await taskModel.findByIdAndDelete(id);
+    res.status(200).json({ message: "Task deleted" });
+  } catch (err) {
+    res.status(500).json({ message: "Task deletion failed" });
+  }
+};
+
+module.exports = {
+  createTasks,
+  getAllTasks,
+  getTasksById,
+  updateTasks,
+  deleteTask,
+};
